@@ -25,7 +25,8 @@ import {
   Sparkles,
   Lock,
   Zap,
-  Globe
+  Globe,
+  CreditCard
 } from 'lucide-react';
 import { QRCodeResponse, NormalizedStatus, VerificationStatusResponse } from '@/types/api';
 import Link from 'next/link';
@@ -230,7 +231,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                     </div>
                     <div>
                       <h4 className="font-semibold text-gray-900">Secure Verification</h4>
-                      <p className="text-sm text-gray-600">Bank-grade security with PingOne Digital Identity</p>
+                      <p className="text-sm text-gray-600">Bank-grade security with advanced digital identity</p>
                     </div>
                   </motion.div>
                   
@@ -558,49 +559,44 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                       </div>
                     </motion.div>
                     
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: 0.4 }}
-                      className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200"
-                    >
-                      <h4 className="text-xl font-semibold text-blue-800 mb-3 flex items-center">
-                        <Zap className="w-5 h-5 mr-2" />
-                        Next Steps
-                      </h4>
-                      
-                      <div className="space-y-3 text-blue-800">
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="w-4 h-4 text-blue-600" />
-                          <span>Your SIM card will be activated within 24 hours</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="w-4 h-4 text-blue-600" />
-                          <span>You'll receive a confirmation email with instructions</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <CheckCircle className="w-4 h-4 text-blue-600" />
-                          <span>Your new number will be sent via SMS</span>
-                        </div>
-                      </div>
-                    </motion.div>
+                                         <motion.div
+                       initial={{ opacity: 0, y: 20 }}
+                       animate={{ opacity: 1, y: 0 }}
+                       transition={{ duration: 0.5, delay: 0.4 }}
+                       className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200"
+                     >
+                       <h4 className="text-xl font-semibold text-blue-800 mb-3 flex items-center">
+                         <Zap className="w-5 h-5 mr-2" />
+                         Next Steps
+                       </h4>
+                       
+                       <div className="space-y-3 text-blue-800">
+                         <div className="flex items-center space-x-2">
+                           <CheckCircle className="w-4 h-4 text-blue-600" />
+                           <span>Complete payment to activate your SIM card</span>
+                         </div>
+                         <div className="flex items-center space-x-2">
+                           <CheckCircle className="w-4 h-4 text-blue-600" />
+                           <span>Choose your preferred payment method</span>
+                         </div>
+                         <div className="flex items-center space-x-2">
+                           <CheckCircle className="w-4 h-4 text-blue-600" />
+                           <span>SIM will be activated within minutes after payment</span>
+                         </div>
+                       </div>
+                     </motion.div>
                   </div>
                 )}
               </CardContent>
               
-              <CardFooter className="flex justify-center space-x-4 pb-6">
+              <CardFooter className="flex justify-center pb-6">
                 <Button 
-                  onClick={resetVerification}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-3 shadow-lg cursor-not-allowed opacity-75"
+                  disabled
                 >
-                  Purchase Another SIM
+                  <CreditCard className="w-5 h-5 mr-2" />
+                  Proceed to Payment
                 </Button>
-                
-                <Link href="/">
-                  <Button variant="outline" className="px-8 py-3 border-2 border-gray-300 hover:border-blue-400 hover:text-blue-600 transition-all duration-200">
-                    Back to Home
-                  </Button>
-                </Link>
               </CardFooter>
             </Card>
           </motion.div>
@@ -740,9 +736,9 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
         >
           <div className="flex items-center justify-center space-x-2 mb-2">
             <Lock className="w-4 h-4" />
-            <span>Powered by PingOne Digital Identity Platform</span>
+            <span>Secure Digital Identity Verification</span>
           </div>
-          <p className="text-xs">Secure • Fast • Reliable</p>
+          <p className="text-xs">Protected • Encrypted • Trusted</p>
         </motion.div>
       </div>
     </div>

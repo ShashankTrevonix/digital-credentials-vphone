@@ -26,7 +26,7 @@ export default function HomePage() {
     {
       icon: Shield,
       title: "Secure Digital Identity",
-      description: "Bank-grade security with PingOne Digital Identity Platform",
+      description: "Bank-grade security with advanced digital identity verification",
       color: "from-blue-500 to-cyan-500"
     },
     {
