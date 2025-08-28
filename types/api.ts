@@ -31,7 +31,7 @@ export interface CheckInSession {
 // PingOne Presentation Request types
 export interface PresentationRequest {
   message: string;
-  protocol: 'NATIVE';
+  protocol: 'OPENID4VP';
   digitalWalletApplication: {
     id: string;
   };
