@@ -39,6 +39,9 @@ export interface PresentationRequest {
     type: string;
     keys: string[];
   }>;
+  issuerFilter: {
+    dids: string[]
+  };
 }
 
 export interface PresentationResponse {
