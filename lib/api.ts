@@ -103,7 +103,12 @@ export async function createPresentationRequest(
         type: 'Your Digital ID from NatWest',
         keys: []
       }
-    ]
+    ],
+    issuerFilter: {
+        dids: [
+            `did:web:auth.pingone.com:${API_CONFIG.pingOne.environmentId}:issuer`
+        ]
+    },
   };
 
   try {
