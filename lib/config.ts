@@ -7,7 +7,12 @@ export const API_CONFIG = {
     clientSecret: 'vUk-gCakP-5k5g_Lzt.N~sazuIXx4VeITHXnigZTZLJNlptvFCupSjBQT3KxEAGo',
     baseUrl: 'https://auth.pingone.eu',
     apiPath: 'https://api.pingone.eu/v1',
-    populationId: 'b530a0ee-64cf-4411-8e42-2659c01c7459'
+    populationId: 'b530a0ee-64cf-4411-8e42-2659c01c7459',
+    issuerFilter: {
+    } as {
+      environmentIds?: string[];
+      dids?: string[];
+    }
   },
   pingDaVinci: {
     // Placeholder for PingDaVinci configuration

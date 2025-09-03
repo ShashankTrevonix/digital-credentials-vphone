@@ -103,14 +103,23 @@ export async function createPresentationRequest(
         type: 'Your Digital ID from NatWest',
         keys: []
       }
-    ],
-    issuerFilter: {
-        dids: [
-            `did:web:auth.pingone.com:${API_CONFIG.pingOne.environmentId}:issuer`
-        ]
-    },
+    ]
   };
 
+  const configuredFilter = API_CONFIG.pingOne.issuerFilter || {};
+  const dids = (configuredFilter.dids || []).filter(Boolean);
+  const envIds = (configuredFilter.environmentIds || []).filter(Boolean);
+
+  if (dids.length > 0 || envIds.length > 0) {
+    presentationRequest.issuerFilter = {};
+    if (dids.length > 0) {
+      presentationRequest.issuerFilter.dids = dids;
+    }
+    if (envIds.length > 0) {
+      presentationRequest.issuerFilter.environmentIds = envIds;
+    }
+  }
+  
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUTS.pingOne);

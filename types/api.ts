@@ -39,8 +39,9 @@ export interface PresentationRequest {
     type: string;
     keys: string[];
   }>;
-  issuerFilter: {
-    dids: string[]
+  issuerFilter?: {
+    dids?: string[];
+    environmentIds?: string[];
   };
 }
 
