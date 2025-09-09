@@ -317,7 +317,7 @@ export default function HomePage() {
               {
                 step: "02",
                 title: "Verify Identity",
-                description: "Complete biometric verification in your NatWest mobile app",
+                description: "Complete biometric verification in your Digital Wallet App",
                 icon: Shield
               },
               {

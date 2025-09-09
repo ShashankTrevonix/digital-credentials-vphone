@@ -8,8 +8,8 @@ This application implements the complete SIM card purchasing flow using digital 
 
 1. **User enters VPhone portal** and requests to purchase a new SIM card
 2. **QR code generation** for mobile app interaction
-3. **Deep link redirect** to NatWest mobile app
-4. **Biometric verification** in the NatWest app
+3. **Deep link redirect** to Digital Wallet App
+4. **Biometric verification** in the Digital Wallet app
 5. **VC selection and consent** for sharing identity information
 6. **Verification and completion** of SIM purchase
 
@@ -124,7 +124,7 @@ The application is configured to work with PingOne's EU environment:
 
 ### For End Users
 1. Click "Start Verification" button
-2. Scan the displayed QR code with your NatWest mobile app
+2. Scan the displayed QR code with your Digital Wallet App
 3. Complete biometric verification in the app
 4. Select and consent to share required credentials
 5. Wait for verification completion

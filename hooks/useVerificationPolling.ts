@@ -46,6 +46,7 @@ export function useVerificationPolling({
   const isPollingRef = useRef(false);
   const consecutiveErrorsRef = useRef(0);
   const startTimeRef = useRef<number>(Date.now());
+  const previousStatusRef = useRef<NormalizedStatus>('pending');
 
   // Check if session has expired
   const isExpired = useCallback(() => {
@@ -100,7 +101,12 @@ export function useVerificationPolling({
       consecutiveErrorsRef.current = 0;
       
       setStatus(normalizedStatus);
-      onStatusChange?.(normalizedStatus, response.verificationStatus, userInfo);
+      
+      // Only call onStatusChange if the status has actually changed
+      if (normalizedStatus !== previousStatusRef.current) {
+        previousStatusRef.current = normalizedStatus;
+        onStatusChange?.(normalizedStatus, response.verificationStatus, userInfo);
+      }
 
       // Stop polling on terminal states
       if (['approved', 'declined', 'expired', 'failed'].includes(normalizedStatus)) {
@@ -191,6 +197,7 @@ export function useVerificationPolling({
     setError(null);
     setIsLoading(false);
     consecutiveErrorsRef.current = 0;
+    previousStatusRef.current = 'pending';
   }, [stopPolling]);
 
   // Cleanup on unmount

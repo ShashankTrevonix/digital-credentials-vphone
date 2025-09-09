@@ -328,7 +328,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                 </CardTitle>
                 
                 <CardDescription className="text-lg text-gray-600">
-                  Use your NatWest mobile app to scan this QR code and complete verification
+                  Use your Digital Wallet App to scan this QR code and complete verification
                 </CardDescription>
               </CardHeader>
               
@@ -356,7 +356,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                     >
                       <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
                         <p className="text-sm text-blue-800 font-medium">
-                          📱 Scan this QR code with your NatWest mobile app
+                          📱 Scan this QR code with your Digital Wallet App
                         </p>
                       </div>
                       
@@ -431,20 +431,6 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                       <span className="text-green-800 font-medium">QR Code scanned successfully</span>
                     </div>
                     
-                    <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-xl border border-green-200">
-                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-green-800 font-medium">Redirected to NatWest app</span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4 p-4 bg-green-50 rounded-xl border border-green-200">
-                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="text-green-800 font-medium">Biometric verification completed</span>
-                    </div>
-                    
                     <motion.div
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
@@ -457,16 +443,6 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                     </motion.div>
                   </motion.div>
                   
-                  {isPolling && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="bg-blue-50 p-4 rounded-xl border border-blue-200 text-center"
-                    >
-                      <Loader2 className="w-6 h-6 animate-spin text-blue-600 mx-auto mb-2" />
-                      <p className="text-blue-800 font-medium">Checking verification status...</p>
-                    </motion.div>
-                  )}
                 </div>
               </CardContent>
               
@@ -563,26 +539,18 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                        initial={{ opacity: 0, y: 20 }}
                        animate={{ opacity: 1, y: 0 }}
                        transition={{ duration: 0.5, delay: 0.4 }}
-                       className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-2xl border border-blue-200"
+                       className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-2xl border border-green-200"
                      >
-                       <h4 className="text-xl font-semibold text-blue-800 mb-3 flex items-center">
-                         <Zap className="w-5 h-5 mr-2" />
-                         Next Steps
+                       <h4 className="text-xl font-semibold text-green-800 mb-3 flex items-center">
+                         <CheckCircle className="w-5 h-5 mr-2" />
+                         Thank You!
                        </h4>
                        
-                       <div className="space-y-3 text-blue-800">
-                         <div className="flex items-center space-x-2">
-                           <CheckCircle className="w-4 h-4 text-blue-600" />
-                           <span>Complete payment to activate your SIM card</span>
-                         </div>
-                         <div className="flex items-center space-x-2">
-                           <CheckCircle className="w-4 h-4 text-blue-600" />
-                           <span>Choose your preferred payment method</span>
-                         </div>
-                         <div className="flex items-center space-x-2">
-                           <CheckCircle className="w-4 h-4 text-blue-600" />
-                           <span>SIM will be activated within minutes after payment</span>
-                         </div>
+                       <div className="text-green-800">
+                         <p className="text-lg leading-relaxed">
+                           Thanks for signing up with us. We have successfully processed your details. 
+                           Your SIM card details will be emailed to you shortly.
+                         </p>
                        </div>
                      </motion.div>
                   </div>
@@ -590,13 +558,11 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
               </CardContent>
               
               <CardFooter className="flex justify-center pb-6">
-                <Button 
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-3 shadow-lg cursor-not-allowed opacity-75"
-                  disabled
-                >
-                  <CreditCard className="w-5 h-5 mr-2" />
-                  Proceed to Payment
-                </Button>
+                <div className="text-center">
+                  <p className="text-sm text-gray-500">
+                    You will receive an email confirmation shortly
+                  </p>
+                </div>
               </CardFooter>
             </Card>
           </motion.div>
