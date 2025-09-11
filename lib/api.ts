@@ -88,7 +88,7 @@ export async function getPingOneAccessToken(): Promise<PingOneTokenResponse> {
 // Create presentation request to generate QR code
 export async function createPresentationRequest(
   accessToken: string, 
-  message: string = "Please present your Digital ID for hotel check-in"
+  message: string = "Please present your NatWest Current Account for SIM card purchase"
 ): Promise<QRCodeResponse> {
   const presentationUrl = `${API_CONFIG.pingOne.apiPath}/environments/${API_CONFIG.pingOne.environmentId}/presentationSessions`;
   
@@ -100,7 +100,7 @@ export async function createPresentationRequest(
     },
     requestedCredentials: [
       {
-        type: 'Your Digital ID from NatWest',
+        type: 'NatWest Current Account',
         keys: []
       }
     ]
@@ -356,23 +356,30 @@ export function flattenCredentialData(credentialData: CredentialDataResponse): F
   }
 }
 
-// Extract user information from credential data
+// Extract user information and bank account details from credential data
 function extractUserInfo(data: Record<string, string>) {
   const userInfo: {
     firstName?: string;
     lastName?: string;
     fullName?: string;
     street?: string;
-    address?: string;
-    city?: string;
+    area?: string;
+    locality?: string;
+    state?: string;
+    country?: string;
     postalCode?: string;
+    address?: string;
     birthdate?: string;
     age?: number;
+    // Bank account details
+    accountHolderName?: string;
+    accountNumber?: string;
+    sortCode?: string;
   } = {};
   
   try {
     // Extract name information
-    userInfo.firstName = data['First Name'] || data['firstName'] || '';
+    userInfo.firstName = data['First Name'] || data['firstName'] || data['accountHolderName'] || '';
     userInfo.lastName = data['Last Name'] || data['lastName'] || '';
     
     // Create full name
@@ -384,19 +391,35 @@ function extractUserInfo(data: Record<string, string>) {
       userInfo.fullName = userInfo.lastName;
     }
     
-    // Extract address information
-    userInfo.street = data['Street'] || data['street'] || '';
-    userInfo.city = data['City'] || data['city'] || '';
-    userInfo.postalCode = data['Postal Code'] || data['postalCode'] || '';
+    // Extract bank account details
+    userInfo.accountHolderName = data['accountHolderName'] || data['Account Holder Name'] || userInfo.fullName || '';
+    userInfo.accountNumber = data['accountNumber'] || data['Account Number'] || '';
+    userInfo.sortCode = data['sortCode'] || data['Sort Code'] || '';
     
-    // Create full address
-    const addressParts = [userInfo.street, userInfo.city, userInfo.postalCode].filter(Boolean);
-    if (addressParts.length > 0) {
-      userInfo.address = addressParts.join(', ');
+    // Extract comprehensive address information
+    userInfo.street = data['Street'] || data['street'] || data['Street Address'] || '';
+    userInfo.area = data['Area'] || data['area'] || data['Suburb'] || data['suburb'] || '';
+    userInfo.locality = data['Locality'] || data['locality'] || data['City'] || data['city'] || '';
+    userInfo.state = data['State'] || data['state'] || data['Province'] || data['province'] || '';
+    userInfo.country = data['Country'] || data['country'] || '';
+    userInfo.postalCode = data['Postal Code'] || data['postalCode'] || data['Postcode'] || data['postcode'] || data['ZIP Code'] || data['zipCode'] || '';
+    
+    // Create full address with all available components
+    const addressComponents = [
+      userInfo.street,
+      userInfo.area,
+      userInfo.locality,
+      userInfo.state,
+      userInfo.country,
+      userInfo.postalCode
+    ].filter(Boolean);
+    
+    if (addressComponents.length > 0) {
+      userInfo.address = addressComponents.join(', ');
     }
     
-    // Extract birthdate and calculate age
-    const birthdateStr = data['Birthdate'] || data['birthdate'] || '';
+    // Extract birthdate using DOB key and calculate age
+    const birthdateStr = data['DOB'] || data['Birthdate'] || data['birthdate'] || data['dateOfBirth'] || '';
     if (birthdateStr) {
       userInfo.birthdate = birthdateStr;
       try {
@@ -415,7 +438,7 @@ function extractUserInfo(data: Record<string, string>) {
       }
     }
     
-    console.log('👤 Extracted user information:', userInfo);
+    console.log('👤 Extracted user information and bank details:', userInfo);
     return userInfo;
   } catch (error) {
     console.error('❌ Error extracting user info:', error);
@@ -434,11 +457,19 @@ export async function checkVerificationStatus(
     firstName?: string;
     lastName?: string;
     fullName?: string;
-    address?: string;
-    city?: string;
+    street?: string;
+    area?: string;
+    locality?: string;
+    state?: string;
+    country?: string;
     postalCode?: string;
+    address?: string;
     birthdate?: string;
     age?: number;
+    // Bank account details
+    accountHolderName?: string;
+    accountNumber?: string;
+    sortCode?: string;
   };
 }> {
   const statusUrl = `${API_CONFIG.pingOne.apiPath}/environments/${environmentId}/presentationSessions/${sessionId}`;

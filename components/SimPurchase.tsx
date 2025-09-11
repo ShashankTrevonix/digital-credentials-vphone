@@ -31,19 +31,56 @@ import {
 import { QRCodeResponse, NormalizedStatus, VerificationStatusResponse } from '@/types/api';
 import Link from 'next/link';
 
-type VerificationStep = 
-  | 'initial'
+// Import new components
+import SimPlans from './SimPlans';
+import SimBasket from './SimBasket';
+import DirectDebitQR from './DirectDebitQR';
+import PurchaseCompleted from './PurchaseCompleted';
+import AccountCredentialsRequest from './AccountCredentialsRequest';
+
+type PurchaseStep = 
+  | 'plans'
+  | 'basket'
+  | 'credentials'
   | 'qr_display'
   | 'verifying'
   | 'completed'
   | 'failed';
+
+interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  data: string;
+  minutes: string;
+  texts: string;
+  features: string[];
+  popular?: boolean;
+  color: string;
+  icon: React.ComponentType<any>;
+}
+
+interface UserDetails {
+  name: string;
+  address: string;
+  dateOfBirth: string;
+}
+
+interface DirectDebitDetails {
+  amount: number;
+  sortCode: string;
+  accountNumber: string;
+}
 
 interface SimPurchaseProps {
   onComplete?: (userData: any) => void;
 }
 
 export default function SimPurchase({ onComplete }: SimPurchaseProps) {
-  const [currentStep, setCurrentStep] = useState<VerificationStep>('initial');
+  const [currentStep, setCurrentStep] = useState<PurchaseStep>('plans');
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [directDebitDetails, setDirectDebitDetails] = useState<DirectDebitDetails | null>(null);
   const [qrCodeData, setQrCodeData] = useState<QRCodeResponse | null>(null);
   const [verificationData, setVerificationData] = useState<{
     name?: string;
@@ -109,7 +146,6 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
         toast.info('QR Code scanned! Please complete verification in your app.');
         break;
       case 'approved':
-        setCurrentStep('completed');
         if (userInfo) {
           setVerificationData({
             name: userInfo.fullName || `${userInfo.firstName} ${userInfo.lastName}`.trim(),
@@ -117,9 +153,13 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
             age: userInfo.age?.toString(),
             verified: true
           });
+          
+          // Handle bank account verification for SIM purchase
+          handleBankAccountVerified(userInfo);
+          
           onComplete?.(userInfo);
         }
-        toast.success('Verification completed successfully!');
+        toast.success('Current Account verified successfully!');
         break;
       case 'declined':
         setCurrentStep('failed');
@@ -139,6 +179,71 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
         break;
     }
   }
+
+  // New step handlers
+  const handlePlanSelect = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setCurrentStep('basket');
+  };
+
+  const handleCheckout = () => {
+    // Start the NatWest Current Account verification process
+    initiateVerification();
+  };
+
+  const handleCredentialsProvided = (credentials: {
+    sortCode: string;
+    accountNumber: string;
+    accountHolderName: string;
+  }) => {
+    setDirectDebitDetails({
+      amount: selectedPlan?.price || 0,
+      sortCode: credentials.sortCode,
+      accountNumber: credentials.accountNumber.slice(-4) // Only last 4 digits
+    });
+    setCurrentStep('qr_display');
+  };
+
+  // Handle verified bank account details from NatWest credential
+  const handleBankAccountVerified = (userInfo: any) => {
+    if (userInfo.accountNumber && userInfo.sortCode) {
+      setDirectDebitDetails({
+        amount: selectedPlan?.price || 0,
+        sortCode: userInfo.sortCode,
+        accountNumber: userInfo.accountNumber.slice(-4) // Only last 4 digits
+      });
+      
+      // Set user details from verified credential
+      setUserDetails({
+        name: userInfo.fullName || userInfo.accountHolderName || 'Verified User',
+        address: userInfo.address || 'Address not provided',
+        dateOfBirth: userInfo.birthdate || 'Not provided'
+      });
+      
+      // Go directly to purchase completed since we have all the information
+      setCurrentStep('completed');
+    } else {
+      // Fallback to manual credentials if bank details not available
+      setCurrentStep('credentials');
+    }
+  };
+
+  const handleDirectDebitComplete = () => {
+    setCurrentStep('completed');
+  };
+
+  const handleBackToPlans = () => {
+    setCurrentStep('plans');
+    setSelectedPlan(null);
+  };
+
+  const handleBackToBasket = () => {
+    setCurrentStep('basket');
+  };
+
+  const handleBackToCredentials = () => {
+    setCurrentStep('credentials');
+  };
 
   // Handle polling errors
   function handlePollingError(error: Error) {
@@ -167,7 +272,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
     } catch (error) {
       console.error('Error initiating verification:', error);
       toast.error('Failed to initiate verification. Please try again.');
-      setCurrentStep('initial');
+      setCurrentStep('plans');
     } finally {
       setIsGeneratingQR(false);
     }
@@ -175,7 +280,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
 
   // Reset to initial state
   const resetVerification = () => {
-    setCurrentStep('initial');
+    setCurrentStep('plans');
     setQrCodeData(null);
     setVerificationData(null);
     setAccessToken(null);
@@ -190,119 +295,51 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
 
   const renderStepContent = () => {
     switch (currentStep) {
-      case 'initial':
+      case 'plans':
         return (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="w-full max-w-2xl mx-auto border-0 shadow-2xl bg-white/90 backdrop-blur-sm">
-              <CardHeader className="text-center pb-8">
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.6, type: "spring" }}
-                  className="mx-auto w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mb-6 shadow-xl"
-                >
-                  <Smartphone className="w-12 h-12 text-white" />
-                </motion.div>
-                
-                <CardTitle className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-4">
-                  SIM Card Purchase
-                </CardTitle>
-                
-                <CardDescription className="text-xl text-gray-600 max-w-md mx-auto leading-relaxed">
-                  Verify your identity using your digital ID to purchase a new SIM card securely
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="px-8 pb-8">
-                <div className="space-y-6 mb-8">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                    className="flex items-center space-x-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100"
-                  >
-                    <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                      <Shield className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Secure Verification</h4>
-                      <p className="text-sm text-gray-600">Bank-grade security with advanced digital identity</p>
-                    </div>
-                  </motion.div>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="flex items-center space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100"
-                  >
-                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Instant Activation</h4>
-                      <p className="text-sm text-gray-600">Get your SIM activated within minutes</p>
-                    </div>
-                  </motion.div>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="flex items-center space-x-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100"
-                  >
-                    <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Global Coverage</h4>
-                                              <p className="text-sm text-gray-600">Connect anywhere with VPhone's network</p>
-                    </div>
-                  </motion.div>
-                </div>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 }}
-                >
-                  <Button 
-                    onClick={initiateVerification} 
-                    disabled={isGeneratingQR}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-6 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
-                    size="lg"
-                  >
-                    {isGeneratingQR ? (
-                      <>
-                        <Loader2 className="mr-3 h-6 w-6 animate-spin" />
-                        Initializing Verification...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="mr-3 h-6 w-6" />
-                        Start Digital ID Verification
-                      </>
-                    )}
-                  </Button>
-                </motion.div>
-              </CardContent>
-              
-              <CardFooter className="flex justify-center pb-6">
-                <Link href="/">
-                  <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
-                    <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Home
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          </motion.div>
+          <SimPlans 
+            onPlanSelect={handlePlanSelect}
+            onBack={() => window.location.href = '/'}
+          />
         );
+
+      case 'basket':
+        return selectedPlan ? (
+          <SimBasket 
+            selectedPlan={selectedPlan}
+            onBack={handleBackToPlans}
+            onCheckout={handleCheckout}
+          />
+        ) : null;
+
+      case 'credentials':
+        return (
+          <AccountCredentialsRequest 
+            onCredentialsProvided={handleCredentialsProvided}
+            onBack={handleBackToBasket}
+          />
+        );
+
+      case 'qr_display':
+        return selectedPlan && qrCodeData ? (
+          <DirectDebitQR 
+            selectedPlan={selectedPlan}
+            qrCodeUrl={qrCodeData.qrCodeUrl}
+            onBack={handleBackToCredentials}
+            onComplete={handleDirectDebitComplete}
+          />
+        ) : null;
+
+      case 'completed':
+        return selectedPlan && userDetails && directDebitDetails ? (
+          <PurchaseCompleted 
+            selectedPlan={selectedPlan}
+            userDetails={userDetails}
+            directDebitDetails={directDebitDetails}
+            onBack={() => setCurrentStep('plans')}
+          />
+        ) : null;
+
 
       case 'qr_display':
         return (
@@ -324,11 +361,11 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                 </motion.div>
                 
                 <CardTitle className="text-3xl font-bold text-gray-900 mb-3">
-                  Scan QR Code
+                  Verify Current Account
                 </CardTitle>
                 
                 <CardDescription className="text-lg text-gray-600">
-                  Use your Digital Wallet App to scan this QR code and complete verification
+                  Scan this QR code with your banking app to verify your account details for direct debit setup
                 </CardDescription>
               </CardHeader>
               
@@ -356,7 +393,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                     >
                       <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
                         <p className="text-sm text-blue-800 font-medium">
-                          📱 Scan this QR code with your Digital Wallet App
+                          📱 Scan this QR code with your banking app
                         </p>
                       </div>
                       
@@ -408,11 +445,11 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                 </motion.div>
                 
                 <CardTitle className="text-3xl font-bold text-gray-900 mb-3">
-                  Verifying Your Identity
+                  Verifying Account
                 </CardTitle>
                 
                 <CardDescription className="text-lg text-gray-600">
-                  Please complete the verification process in your mobile app
+                  Please complete the account verification in your banking app
                 </CardDescription>
               </CardHeader>
               
@@ -428,7 +465,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                       <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                         <CheckCircle className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-green-800 font-medium">QR Code scanned successfully</span>
+                      <span className="text-green-800 font-medium">Account scanned successfully</span>
                     </div>
                     
                     <motion.div
@@ -439,7 +476,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                       <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <Loader2 className="w-5 h-5 text-white animate-spin" />
                       </div>
-                      <span className="text-blue-800 font-medium">Verifying credentials...</span>
+                      <span className="text-blue-800 font-medium">Verifying account details...</span>
                     </motion.div>
                   </motion.div>
                   
@@ -661,32 +698,6 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <div className="flex items-center justify-center space-x-3 mb-6">
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Home
-              </Button>
-            </Link>
-          </div>
-          
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              SIM Card Purchase
-            </span>
-          </h1>
-          
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Experience secure, contactless SIM card purchase using your digital identity
-          </p>
-        </motion.div>
 
         {/* Main Content */}
         <AnimatePresence mode="wait">

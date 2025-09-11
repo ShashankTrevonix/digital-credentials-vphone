@@ -155,11 +155,19 @@ export interface FlattenedCredentialData {
       firstName?: string;
       lastName?: string;
       fullName?: string;
-      address?: string;
-      city?: string;
+      street?: string;
+      area?: string;
+      locality?: string;
+      state?: string;
+      country?: string;
       postalCode?: string;
+      address?: string;
       birthdate?: string;
       age?: number;
+      // Bank account details
+      accountHolderName?: string;
+      accountNumber?: string;
+      sortCode?: string;
     };
   };
 }

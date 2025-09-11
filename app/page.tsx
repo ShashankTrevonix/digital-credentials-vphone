@@ -305,7 +305,7 @@ export default function HomePage() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-3 gap-8"
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 items-start"
           >
             {[
               {
@@ -330,7 +330,7 @@ export default function HomePage() {
               <motion.div
                 key={index}
                 variants={itemVariants}
-                className="relative text-center group"
+                className="relative text-center group flex flex-col items-center"
               >
                 <div className="relative">
                   <motion.div
@@ -340,10 +340,6 @@ export default function HomePage() {
                   >
                     {step.step}
                   </motion.div>
-                  
-                  {index < 2 && (
-                    <div className="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 transform -translate-y-1/2 z-0"></div>
-                  )}
                 </div>
                 
                 <div className="relative z-10">
