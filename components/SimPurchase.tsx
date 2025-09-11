@@ -580,12 +580,12 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
                      >
                        <h4 className="text-xl font-semibold text-green-800 mb-3 flex items-center">
                          <CheckCircle className="w-5 h-5 mr-2" />
-                         Thank You!
+                         Order Completed!
                        </h4>
                        
                        <div className="text-green-800">
                          <p className="text-lg leading-relaxed">
-                           Thanks for signing up with us. We have successfully processed your details. 
+                           Thanks for signing up with us. We have successfully processed your order. 
                            Your SIM card details will be emailed to you shortly.
                          </p>
                        </div>
