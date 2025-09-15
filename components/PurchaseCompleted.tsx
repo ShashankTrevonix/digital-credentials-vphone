@@ -90,7 +90,7 @@ export default function PurchaseCompleted({
         </h1>
         
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Your SIM card has been successfully ordered and will be activated shortly
+          Your SIM card has been successfully ordered and will be delivered to your address within 2-3 business days
         </p>
       </motion.div>
 
@@ -108,18 +108,18 @@ export default function PurchaseCompleted({
             <CardContent className="space-y-4">
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <span className="text-gray-600">Monthly Amount (inc. VAT)</span>
-                  <span className="text-xl font-bold text-green-700">£{(directDebitDetails.amount * 1.2).toFixed(2)}</span>
+                  <span className="text-gray-600">Monthly Amount (VAT inclusive)</span>
+                  <span className="text-xl font-bold text-green-700">£{directDebitDetails.amount.toFixed(2)}</span>
                 </div>
                 
                 <div className="text-sm text-gray-600 space-y-1">
                   <div className="flex justify-between">
-                    <span>Plan Price:</span>
-                    <span>£{directDebitDetails.amount}</span>
+                    <span>Plan Price (ex. VAT):</span>
+                    <span>£{(directDebitDetails.amount * 0.8333).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>VAT (20%):</span>
-                    <span>£{(directDebitDetails.amount * 0.2).toFixed(2)}</span>
+                    <span>£{(directDebitDetails.amount * 0.1667).toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -162,16 +162,17 @@ export default function PurchaseCompleted({
               <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
                 <MapPin className="w-5 h-5 text-blue-600" />
                 <div>
-                  <p className="text-sm text-gray-600">Address</p>
+                  <p className="text-sm text-gray-600">SIM Delivery Address</p>
                   <p className="font-semibold text-gray-900">{userDetails.address}</p>
+                  <p className="text-xs text-blue-600 mt-1">📦 Your SIM card will be delivered to this address</p>
                 </div>
               </div>
               
-              <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                <Calendar className="w-5 h-5 text-blue-600" />
+              <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                <CheckCircle className="w-5 h-5 text-green-600" />
                 <div>
-                  <p className="text-sm text-gray-600">Date of Birth</p>
-                  <p className="font-semibold text-gray-900">{userDetails.dateOfBirth}</p>
+                  <p className="text-sm text-gray-600">Age Verification</p>
+                  <p className="font-semibold text-green-700">Age verified - Above 18</p>
                 </div>
               </div>
             </CardContent>
@@ -251,13 +252,21 @@ export default function PurchaseCompleted({
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">3</div>
                   <div>
-                    <p className="font-semibold text-gray-900">SIM Activation</p>
-                    <p className="text-sm text-gray-600">Your SIM will be activated within 24 hours</p>
+                    <p className="font-semibold text-gray-900">SIM Delivery</p>
+                    <p className="text-sm text-gray-600">Your SIM card will be delivered to your address within 2-3 business days</p>
                   </div>
                 </div>
                 
                 <div className="flex items-start space-x-3">
                   <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">4</div>
+                  <div>
+                    <p className="font-semibold text-gray-900">SIM Activation</p>
+                    <p className="text-sm text-gray-600">Your SIM will be activated automatically upon delivery</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start space-x-3">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">5</div>
                   <div>
                     <p className="font-semibold text-gray-900">Start Using</p>
                     <p className="text-sm text-gray-600">Insert your SIM and start enjoying your new plan</p>
@@ -321,8 +330,8 @@ export default function PurchaseCompleted({
                 <h4 className="font-semibold text-green-800 mb-2">Order Completed Successfully</h4>
                 <p className="text-sm text-green-700">
                   Thank you for choosing VPhone! Your order has been processed securely. 
-                  You will receive an email confirmation with your SIM card details shortly. 
-                  If you have any questions, please contact our support team.
+                  You will receive an email confirmation with your SIM card details and delivery tracking information shortly. 
+                  Your SIM card will be delivered to the address provided within 2-3 business days.
                 </p>
               </div>
             </div>

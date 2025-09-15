@@ -165,6 +165,9 @@ export default function SimPlans({ onPlanSelect, onBack }: SimPlansProps) {
                   <span className="text-4xl font-bold text-gray-900">£{plan.price}</span>
                   <span className="text-gray-600 ml-2">/month</span>
                 </div>
+                <div className="text-sm text-gray-500 text-center">
+                  VAT inclusive
+                </div>
                 
                 <CardDescription className="text-gray-600">
                   Perfect for {plan.name.toLowerCase()} users

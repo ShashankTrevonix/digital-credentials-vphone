@@ -45,9 +45,9 @@ export default function SimBasket({ selectedPlan, onBack, onCheckout }: SimBaske
     onCheckout();
   };
 
-  const subtotal = selectedPlan.price;
-  const vat = subtotal * 0.2; // 20% VAT
-  const total = subtotal + vat;
+  const total = selectedPlan.price; // Price is now VAT inclusive
+  const vat = total / 6; // VAT is 1/6 of the VAT-inclusive price (20% of net = 16.67% of gross)
+  const subtotal = total - vat;
 
   return (
     <motion.div
@@ -98,7 +98,10 @@ export default function SimBasket({ selectedPlan, onBack, onCheckout }: SimBaske
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="text-xl font-semibold text-gray-900">{selectedPlan.name}</h3>
-                      <span className="text-2xl font-bold text-gray-900">£{selectedPlan.price}/month</span>
+                      <div className="text-right">
+                        <span className="text-2xl font-bold text-gray-900">£{selectedPlan.price}/month</span>
+                        <div className="text-xs text-gray-500">VAT inclusive</div>
+                      </div>
                     </div>
                     
                     <div className="grid grid-cols-3 gap-4 mb-4">
@@ -173,7 +176,7 @@ export default function SimBasket({ selectedPlan, onBack, onCheckout }: SimBaske
               <div className="space-y-3">
                 <div className="flex justify-between text-gray-600">
                   <span>Plan ({selectedPlan.name})</span>
-                  <span>£{selectedPlan.price}</span>
+                  <span>£{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>SIM Card</span>
@@ -189,7 +192,7 @@ export default function SimBasket({ selectedPlan, onBack, onCheckout }: SimBaske
                 </div>
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-lg font-bold text-gray-900">
-                    <span>Total</span>
+                    <span>Total (VAT inclusive)</span>
                     <span>£{total.toFixed(2)}</span>
                   </div>
                   <div className="text-sm text-gray-600 mt-1">
@@ -222,7 +225,7 @@ export default function SimBasket({ selectedPlan, onBack, onCheckout }: SimBaske
                   </>
                 ) : (
                   <>
-                    Proceed to Checkout
+                    Choose Payment Method
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </>
                 )}

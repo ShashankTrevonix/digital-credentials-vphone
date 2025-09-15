@@ -34,6 +34,8 @@ import Link from 'next/link';
 // Import new components
 import SimPlans from './SimPlans';
 import SimBasket from './SimBasket';
+import PaymentMethodSelection from './PaymentMethodSelection';
+import ManualDetailsForm from './ManualDetailsForm';
 import DirectDebitQR from './DirectDebitQR';
 import PurchaseCompleted from './PurchaseCompleted';
 import AccountCredentialsRequest from './AccountCredentialsRequest';
@@ -41,6 +43,8 @@ import AccountCredentialsRequest from './AccountCredentialsRequest';
 type PurchaseStep = 
   | 'plans'
   | 'basket'
+  | 'payment_method_selection'
+  | 'manual_details'
   | 'credentials'
   | 'qr_display'
   | 'verifying'
@@ -187,8 +191,8 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
   };
 
   const handleCheckout = () => {
-    // Start the NatWest Current Account verification process
-    initiateVerification();
+    // Go to payment method selection instead of direct verification
+    setCurrentStep('payment_method_selection');
   };
 
   const handleCredentialsProvided = (credentials: {
@@ -243,6 +247,53 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
 
   const handleBackToCredentials = () => {
     setCurrentStep('credentials');
+  };
+
+  const handleBackToPaymentMethodSelection = () => {
+    setCurrentStep('payment_method_selection');
+  };
+
+  const handleSelectManualPayment = () => {
+    setCurrentStep('manual_details');
+  };
+
+  const handleSelectDigitalPayment = () => {
+    // Start the NatWest Current Account verification process
+    initiateVerification();
+  };
+
+  const handleManualDetailsSubmit = (details: {
+    firstName: string;
+    lastName: string;
+    address: string;
+    dateOfBirth: string;
+    paymentMethod: 'paypal' | 'card';
+    cardDetails?: {
+      cardNumber: string;
+      expiryDate: string;
+      cvv: string;
+      cardholderName: string;
+    };
+    paypalEmail?: string;
+  }) => {
+    // Set user details from manual form
+    setUserDetails({
+      name: `${details.firstName} ${details.lastName}`,
+      address: details.address,
+      dateOfBirth: details.dateOfBirth
+    });
+    
+    // Set direct debit details (for manual payment, we'll use a placeholder)
+    setDirectDebitDetails({
+      amount: selectedPlan?.price || 0,
+      sortCode: details.paymentMethod === 'card' ? 'Card' : 'PayPal',
+      accountNumber: details.paymentMethod === 'card' 
+        ? `****${details.cardDetails?.cardNumber.slice(-4) || '****'}` 
+        : details.paypalEmail || '****'
+    });
+    
+    // Go directly to completed since we have all the information for manual payment
+    setCurrentStep('completed');
   };
 
   // Handle polling errors
@@ -312,6 +363,25 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
           />
         ) : null;
 
+      case 'payment_method_selection':
+        return selectedPlan ? (
+          <PaymentMethodSelection 
+            selectedPlan={selectedPlan}
+            onBack={handleBackToBasket}
+            onSelectManual={handleSelectManualPayment}
+            onSelectDigital={handleSelectDigitalPayment}
+          />
+        ) : null;
+
+      case 'manual_details':
+        return selectedPlan ? (
+          <ManualDetailsForm 
+            selectedPlan={selectedPlan}
+            onBack={handleBackToPaymentMethodSelection}
+            onSubmit={handleManualDetailsSubmit}
+          />
+        ) : null;
+
       case 'credentials':
         return (
           <AccountCredentialsRequest 
@@ -325,7 +395,7 @@ export default function SimPurchase({ onComplete }: SimPurchaseProps) {
           <DirectDebitQR 
             selectedPlan={selectedPlan}
             qrCodeUrl={qrCodeData.qrCodeUrl}
-            onBack={handleBackToCredentials}
+            onBack={handleBackToPaymentMethodSelection}
             onComplete={handleDirectDebitComplete}
           />
         ) : null;

@@ -165,7 +165,10 @@ export default function DirectDebitQR({ selectedPlan, qrCodeUrl, onBack, onCompl
               <div className="space-y-4">
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <span className="font-semibold text-gray-900">{selectedPlan.name}</span>
-                  <span className="text-lg font-bold text-gray-900">£{selectedPlan.price}/month</span>
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-gray-900">£{selectedPlan.price}/month</span>
+                    <div className="text-xs text-gray-500">VAT inclusive</div>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-3 text-center">
@@ -254,7 +257,7 @@ export default function DirectDebitQR({ selectedPlan, qrCodeUrl, onBack, onCompl
           className="px-8 py-3 border-2 border-gray-300 hover:border-gray-400 transition-all duration-200"
         >
           <ArrowLeft className="mr-2 w-4 h-4" />
-          Back to Basket
+          Back to Payment Methods
         </Button>
       </motion.div>
     </motion.div>
