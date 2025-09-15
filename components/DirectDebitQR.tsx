@@ -87,7 +87,7 @@ export default function DirectDebitQR({ selectedPlan, qrCodeUrl, onBack, onCompl
         </motion.div>
         
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Set Up Direct Debit
+          Verify Your Personal Information and Set Up Direct Debit
         </h1>
         
         <p className="text-gray-600 max-w-2xl mx-auto">
