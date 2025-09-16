@@ -137,7 +137,7 @@ export default function PaymentMethodSelection({
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-xl text-gray-900 flex items-center space-x-2">
-                      <span>Use your Bank's Digital ID</span>
+                      <span>Use Your Bank Issued Digital Credential</span>
                       <Zap className="w-5 h-5 text-yellow-500" />
                     </CardTitle>
                     <CardDescription className="text-gray-600">
