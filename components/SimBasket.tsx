@@ -153,7 +153,7 @@ export default function SimBasket({ selectedPlan, onBack, onCheckout }: SimBaske
                     </div>
                     <div className="flex justify-between">
                       <span>Delivery:</span>
-                      <span className="font-medium">Physical Delivery</span>
+                      <span className="font-medium">To your address</span>
                     </div>
                   </div>
                 </div>
@@ -226,7 +226,6 @@ export default function SimBasket({ selectedPlan, onBack, onCheckout }: SimBaske
                 ) : (
                   <div className="flex items-center justify-center space-x-2">
                     <span>Choose Payment Method</span>
-                    <ArrowRight className="w-5 h-5 flex-shrink-0" />
                   </div>
                 )}
               </Button>
